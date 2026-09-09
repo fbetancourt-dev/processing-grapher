@@ -231,6 +231,18 @@ class Settings implements TabAPI {
 				println("Unable to parse user settings - <usage-instructions>\n" + e);
 			}
 
+			// Toggle record timestamp on/off
+			entry = xmlFile.getChild("record-timestamp");
+			if (entry != null) {
+				try {
+					int value = entry.getInt("enabled", 0);
+					if (value == 1) recordTimestamp = true;
+					else recordTimestamp = false;
+				} catch (Exception e) {
+					println("Unable to parse user settings - <record-timestamp>\n" + e);
+				}
+			}
+
 			// Get serial port settings
 			entry = xmlFile.getChild("serial-port");
 			try {
@@ -306,6 +318,8 @@ class Settings implements TabAPI {
 		xmlFile.getChild("fps-indicator").setInt("visible", int(drawFPS));
 		xmlFile.addChild("usage-instructions");
 		xmlFile.getChild("usage-instructions").setInt("visible", int(showInstructions));
+		xmlFile.addChild("record-timestamp");
+		xmlFile.getChild("record-timestamp").setInt("enabled", int(recordTimestamp));
 		xmlFile.addChild("serial-port");
 		xmlFile.getChild("serial-port").setInt("baud-rate", baudRate);
 		xmlFile.getChild("serial-port").setString("line-ending", str(lineEnding));
@@ -340,7 +354,7 @@ class Settings implements TabAPI {
 		int iH = round((sideItemHeight - 5) * uimult);
 		int iL = round(sL + (10 * uimult));
 		int iW = round(sW - (20 * uimult));
-		if (menuLevel == 0) menuHeight = round(23 * uH);
+		if (menuLevel == 0) menuHeight = round(25.5 * uH);
 		else if (menuLevel == 1) menuHeight = round((3 + baudRateListFull.length) * uH);
 		else if (menuLevel == 2) menuHeight = round((3 + lineEndingList.length) * uH);
 		else if (menuLevel == 3) menuHeight = round((3 + parityBitsList.length) * uH);
@@ -396,25 +410,31 @@ class Settings implements TabAPI {
 			drawButton("Hide", (!showInstructions)? c_sidebar_accent:c_sidebar_button, iL + (iW/2), sT + (uH * 10.5), iW/2, iH, tH);
 			drawRectangle(c_sidebar_divider, iL + (iW / 2), sT + (uH * 10.5) + (1 * uimult), 1 * uimult, iH - (2 * uimult));
 
-			drawHeading("Serial Port", iL, sT + (uH * 12), iW, tH);
+			// Turn PC timestamp recording on/off
+			drawHeading("Record PC Timestamp", iL, sT + (uH * 12), iW, tH);
+			drawButton("Off", (!recordTimestamp)? c_sidebar_accent:c_sidebar_button, iL, sT + (uH * 13), iW/2, iH, tH);
+			drawButton("On", (recordTimestamp)? c_sidebar_accent:c_sidebar_button, iL + (iW/2), sT + (uH * 13), iW/2, iH, tH);
+			drawRectangle(c_sidebar_divider, iL + (iW / 2), sT + (uH * 13) + (1 * uimult), 1 * uimult, iH - (2 * uimult));
+
+			drawHeading("Serial Port", iL, sT + (uH * 14.5), iW, tH);
 			color c_serial_items = c_sidebar_text;
 			if (serialConnected) c_serial_items = c_sidebar_button;
-			drawDatabox("Baud: " + baudRate, c_serial_items, iL, sT + (uH * 13), iW, iH, tH);
-			drawDatabox("Line Ending: " + ((lineEnding == '\r')? "CR":"NL"), c_serial_items, iL, sT + (uH * 14), iW, iH, tH);
-			drawDatabox("Parity: " + serialParity, c_serial_items, iL, sT + (uH * 15), iW, iH, tH);
-			drawDatabox("Data Bits: " + serialDatabits, c_serial_items, iL, sT + (uH * 16), iW, iH, tH);
-			drawDatabox("Stop Bits: " + serialStopbits, c_serial_items, iL, sT + (uH * 17), iW, iH, tH);
-			drawDatabox("Separator: [ " + ((separator == '\t')? "\\t":separator) + " ]", c_sidebar_text, iL, sT + (uH * 18), iW, iH, tH);
+			drawDatabox("Baud: " + baudRate, c_serial_items, iL, sT + (uH * 15.5), iW, iH, tH);
+			drawDatabox("Line Ending: " + ((lineEnding == '\r')? "CR":"NL"), c_serial_items, iL, sT + (uH * 16.5), iW, iH, tH);
+			drawDatabox("Parity: " + serialParity, c_serial_items, iL, sT + (uH * 17.5), iW, iH, tH);
+			drawDatabox("Data Bits: " + serialDatabits, c_serial_items, iL, sT + (uH * 18.5), iW, iH, tH);
+			drawDatabox("Stop Bits: " + serialStopbits, c_serial_items, iL, sT + (uH * 19.5), iW, iH, tH);
+			drawDatabox("Separator: [ " + ((separator == '\t')? "\\t":separator) + " ]", c_sidebar_text, iL, sT + (uH * 20.5), iW, iH, tH);
 
 			// Save preferences
-			drawHeading("User Preferences", iL, sT + (uH * 19.5), iW, tH);
-			if (unsavedChanges) drawButton("Save Settings", c_sidebar_button, iL, sT + (uH * 20.5), iW, iH, tH);
-			else drawDatabox("Save Settings", c_sidebar_button, iL, sT + (uH * 20.5), iW, iH, tH);
+			drawHeading("User Preferences", iL, sT + (uH * 22), iW, tH);
+			if (unsavedChanges) drawButton("Save Settings", c_sidebar_button, iL, sT + (uH * 23), iW, iH, tH);
+			else drawDatabox("Save Settings", c_sidebar_button, iL, sT + (uH * 23), iW, iH, tH);
 
 			if (checkDefault()) {
-				drawButton("Reset to Default", c_sidebar_button, iL, sT + (uH * 21.5), iW, iH, tH);
+				drawButton("Reset to Default", c_sidebar_button, iL, sT + (uH * 24), iW, iH, tH);
 			} else {
-				drawDatabox("Reset to Default", c_sidebar_button, iL, sT + (uH * 21.5), iW, iH, tH);
+				drawDatabox("Reset to Default", c_sidebar_button, iL, sT + (uH * 24), iW, iH, tH);
 			}
 
 		// Baud rate selection
@@ -504,6 +524,7 @@ class Settings implements TabAPI {
 		if (!showInstructions) return true;
 		if (drawFPS) return true;
 		if (colorScheme != 1) return true;
+		if (recordTimestamp) return true;
 		if (!serialConnected) {
 			if (baudRate != 9600) return true;
 			if (lineEnding != '\n') return true;
@@ -756,8 +777,28 @@ class Settings implements TabAPI {
 				}
 			}
 
+			// Record PC Timestamp toggle
+			else if (menuYclick(ycoord, sT, uH, iH, 13)) {
+				// Off
+				if (menuXclick(xcoord, iL, iW / 2)) {
+					if (recordTimestamp) {
+						recordTimestamp = false;
+						unsavedChanges = true;
+						redrawUI = true;
+					}
+				}
+				// On
+				else if (menuXclick(xcoord, iL + (iW / 2), iW / 2)) {
+					if (!recordTimestamp) {
+						recordTimestamp = true;
+						unsavedChanges = true;
+						redrawUI = true;
+					}
+				}
+			}
+
 			// Baud rate selection
-			else if (menuXYclick(xcoord, ycoord, sT, uH, iH, 13, iL, iW)) {
+			else if (menuXYclick(xcoord, ycoord, sT, uH, iH, 15.5, iL, iW)) {
 				if (!serialConnected) {
 					menuLevel = 1;
 					menuScroll = 0;
@@ -766,7 +807,7 @@ class Settings implements TabAPI {
 			}
 
 			// Line ending selection
-			else if (menuXYclick(xcoord, ycoord, sT, uH, iH, 14, iL, iW)) {
+			else if (menuXYclick(xcoord, ycoord, sT, uH, iH, 16.5, iL, iW)) {
 				if (!serialConnected) {
 					menuLevel = 2;
 					menuScroll = 0;
@@ -775,7 +816,7 @@ class Settings implements TabAPI {
 			}
 
 			// Parity selection
-			else if (menuXYclick(xcoord, ycoord, sT, uH, iH, 15, iL, iW)) {
+			else if (menuXYclick(xcoord, ycoord, sT, uH, iH, 17.5, iL, iW)) {
 				if (!serialConnected) {
 					menuLevel = 3;
 					menuScroll = 0;
@@ -784,7 +825,7 @@ class Settings implements TabAPI {
 			}
 
 			// Data bits selection
-			else if (menuXYclick(xcoord, ycoord, sT, uH, iH, 16, iL, iW)) {
+			else if (menuXYclick(xcoord, ycoord, sT, uH, iH, 18.5, iL, iW)) {
 				if (!serialConnected) {
 					menuLevel = 4;
 					menuScroll = 0;
@@ -793,7 +834,7 @@ class Settings implements TabAPI {
 			}
 
 			// Stop bits selection
-			else if (menuXYclick(xcoord, ycoord, sT, uH, iH, 17, iL, iW)) {
+			else if (menuXYclick(xcoord, ycoord, sT, uH, iH, 19.5, iL, iW)) {
 				if (!serialConnected) {
 					menuLevel = 5;
 					menuScroll = 0;
@@ -802,23 +843,24 @@ class Settings implements TabAPI {
 			}
 
 			// Separator selection
-			else if (menuXYclick(xcoord, ycoord, sT, uH, iH, 18, iL, iW)) {
+			else if (menuXYclick(xcoord, ycoord, sT, uH, iH, 20.5, iL, iW)) {
 				menuLevel = 6;
 				menuScroll = 0;
 				redrawUI = true;
 			}
 
 			// Remember preferences
-			else if (menuXYclick(xcoord, ycoord, sT, uH, iH, 20.5, iL, iW)) {
+			else if (menuXYclick(xcoord, ycoord, sT, uH, iH, 23, iL, iW)) {
 				if (unsavedChanges) saveSettings();
 			}
 
 			// Reset preferences to default
-			else if (menuXYclick(xcoord, ycoord, sT, uH, iH, 21.5, iL, iW)) {
+			else if (menuXYclick(xcoord, ycoord, sT, uH, iH, 24, iL, iW)) {
 				if (checkDefault()) {
 					drawFPS = false;
 					showInstructions = true;
 					colorScheme = 1;
+					recordTimestamp = false;
 
 					if (!serialConnected) {
 						baudRate = 9600;

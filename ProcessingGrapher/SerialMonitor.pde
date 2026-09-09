@@ -74,7 +74,7 @@ class SerialMonitor implements TabAPI {
 	color newColor = c_red;
 	int colorSelector = 0;
 
-	final int[] baudRateList = {300, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 74880, 115200, 230400, 250000};;
+	final int[] baudRateList = {300, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 74880, 115200, 230400, 250000, 460800, 500000, 921600, 1000000, 2000000};
 	SerialMessages serialBuffer;                              //! Ring buffer used to store serial messages
 	//PGraphics serialGraphics;
 
@@ -539,7 +539,11 @@ class SerialMonitor implements TabAPI {
 			recordCounter++;
 
 			try {
-				dataWriter.println(inputData);
+				if (recordTimestamp) {
+					dataWriter.println("[" + getTimestampString() + "] " + inputData);
+				} else {
+					dataWriter.println(inputData);
+				}
 				if (dataWriter.checkError()) {
 					emergencyOutputSave(true);
 				}

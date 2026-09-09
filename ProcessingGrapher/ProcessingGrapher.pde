@@ -8,7 +8,7 @@
  *
  * @copyright GNU General Public License v3
  * @date      September 2026
- * @version   1.7.1
+ * @version   1.7.2
  * * * * * * * * * * * * * * * * * * * * * * */
 
 /*
@@ -31,13 +31,16 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-final String versionNumber = "1.7.1";
+final String versionNumber = "1.7.2";
 
 // Swing for input popups
 import static javax.swing.JOptionPane.*;
 
 // Serial port handling
 import processing.serial.*;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.concurrent.locks.ReentrantLock;
 
 // Advanced key inputs
@@ -140,6 +143,7 @@ char serialParity = 'N';
 int serialDatabits = 8;
 float serialStopbits = 1.0;
 char separator = ',';
+boolean recordTimestamp = false;
 
 
 /**
@@ -2434,11 +2438,21 @@ String[] remove(String[] a, int index){
 boolean numberMessage(String msg) {
 	for (int i = 0; i < msg.length() - 1; i++) {
 		final char j = msg.charAt(i);
-		if (((j < 43 && j != ' ') || j > 57 || j == 47) && (j != separator)) {
+		if (((j < 43 && j != ' ') || j > 57 || j == 47) && (j != separator) && j != 'e' && j != 'E') {
 			return false;
 		}
 	}
 	return true;
+}
+
+
+/**
+ * Get current system timestamp formatted as yyyy-MM-dd HH:mm:ss.SSS
+ *
+ * @return String timestamp
+ */
+String getTimestampString() {
+	return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date());
 }
 
 

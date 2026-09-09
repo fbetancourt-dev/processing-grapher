@@ -63,7 +63,7 @@ To install the application shortcut and official magenta graph icon into your ap
 
 ### Connecting to a Serial Device
 - **Select Port:** Select the **Port** relating to the device you want to connect to from the sidebar dropdown. The port list will automatically update when new devices are plugged into the computer.
-- **Set Baud Rate:** Set the **Baud rate** for the serial communication. The most common rates used with Arduinos are `9600` or `115200` (extended baud rates up to `2000000` are supported).
+- **Set Baud Rate:** Set the **Baud rate** for the serial communication. The most common rates used with Arduinos are `9600` or `115200`. The quick selection menu directly supports standard and high-speed rates up to `2000000` (including `230400`, `250000`, `460800`, `500000`, `921600`, `1000000`, and `2000000`).
 - **Connect / Disconnect:** Press the **Connect/Disconnect** button to begin and end communication with the serial device. When disconnecting, make sure to hit the disconnect button before you unplug the device! Otherwise the serial port list won’t update properly anymore! *(Shortcut: `CTRL-Q`)*
 
 ### Terminal Console Area
@@ -80,6 +80,7 @@ To install the application shortcut and official magenta graph icon into your ap
 - Press the **Set Output File** button to set where the recorded messages will be saved. *(Shortcut: `CTRL-S`)*
 - Press **Start/Stop Recording** button to start and end the serial message recording process. *(Shortcut: `CTRL-R`)*
 - The output file path where the recorded messages will be saved is shown in the bottom status bar.
+- **PC Timestamp Logging:** If `Record PC Timestamp` is enabled in the Settings menu, each recorded line in the text file is automatically prepended with the computer timestamp `[yyyy-MM-dd HH:mm:ss.SSS]`.
 
 ### Adding Colour Keyword Tags
 The terminal console has a unique feature that it can change the colour of lines which contain specific text or keywords. If you receive a lot of serial messages, this can make it a lot easier to spot the important messages you are looking for.
@@ -97,6 +98,7 @@ The terminal console has a unique feature that it can change the colour of lines
 ### Message Format for Real-time Plotting
 To plot real-time signals received from the serial device, the messages being received need to follow a specific format:
 - Each message must contain the current values of all of the signals you want to plot, separated by commas.
+- Both standard decimal numbers and scientific notation (such as `1.25e-3`, `-4.2E+02`) are natively supported.
 - The message must end with the **New Line (`\n`)** character.
 - The messages need to be sent at regular time-intervals.
 - The message cannot contain any other characters which are not numbers or commas…
@@ -145,6 +147,7 @@ void loop () {
 - **Signal List & Ordering:** At the bottom of the right-hand menu, all of the automatically detected signals and their respective colours are listed:
   - You can click on the signal name to change the name to something different. *Note: this option is disabled once data recording has been started.*
   - Click on the **up (▲)** and **down (▼)** arrow buttons to move the signals onto different graphs.
+  - When moved into the **Hidden** group, the downward arrow becomes an **`x`** button, allowing you to permanently remove unwanted or orphaned signals from the active session.
   - If you click the up arrow from **“Graph 1”**, then that signal will be used as the **X-axis** for all the other signals (enabling XY / phase plots).
 
 ### Recording Signals to a CSV File
@@ -153,6 +156,7 @@ void loop () {
 - Press **Start/Stop Recording** button to start and end the serial message recording process. *(Shortcut: `CTRL-R`)*
 - The output file path where the recorded messages will be saved is shown in the bottom status bar.
 - For long-duration logging, files are automatically split into manageable chunks of 100,000 rows.
+- **Optional PC Timestamp:** When `Record PC Timestamp` is enabled in Settings, a leading `Timestamp` column with system clock timestamps (`yyyy-MM-dd HH:mm:ss.SSS`) is automatically included in the recorded CSV.
 
 ### Changing Graph Settings
 - To change the settings associated with a specific graph, click anywhere on the graph to select it. The title of the graph will turn red to show that it has been selected. The number of the selected graph is also shown in the menu: **Graph X - Options**.
@@ -231,6 +235,7 @@ The “File Graph” tab can be used to analyse data which you recorded earlier.
   - **Celeste** (Bright, light mode)
 - **FPS Indicator:** A small indicator of the current frame rate of the program can be enabled or disabled.
 - **Startup Guides:** The instruction guides which are shown in the program when no serial devices are connected can be disabled.
+- **Record PC Timestamp:** Toggle between `Off` and `On`. When enabled, computer system timestamps (`yyyy-MM-dd HH:mm:ss.SSS`) are exported to recorded CSV telemetry files and TXT terminal logs.
 
 ### Advanced Serial Port Settings
 - Advanced settings related to the serial port configurations (parity, data bits, stop bits, custom delimiters) can be changed here *(Note: options can only be changed when the serial port is disconnected)*.

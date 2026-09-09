@@ -613,6 +613,43 @@ class LiveGraph implements TabAPI {
 
 
 	/**
+	 * Remove a signal from live data
+	 *
+	 * @param  removeIdx The index of the signal to remove
+	 */
+	void removeSignal(int removeIdx) {
+		lock.lock();
+		try {
+			if (removeIdx >= 0 && removeIdx < dataColumns.length) {
+				String[] newCols = new String[dataColumns.length - 1];
+				int[] newAssign = new int[graphAssignment.length - 1];
+				int ptr = 0;
+				for (int k = 0; k < dataColumns.length; k++) {
+					if (k != removeIdx) {
+						newCols[ptr] = dataColumns[k];
+						newAssign[ptr] = graphAssignment[k];
+						ptr++;
+					}
+				}
+				dataColumns = newCols;
+				graphAssignment = newAssign;
+				if (removeIdx < dataTable.getColumnCount()) {
+					dataTable.removeColumn(removeIdx);
+				}
+				if (customXaxis == removeIdx) {
+					customXaxis = -1;
+					autoAxis = 1;
+				} else if (customXaxis > removeIdx) {
+					customXaxis--;
+				}
+			}
+		} finally {
+			lock.unlock();
+		}
+	}
+
+
+	/**
 	 * Parse new data points received from serial port
 	 *
 	 * @param  inputData String containing data points separated by commas
@@ -861,8 +898,8 @@ class LiveGraph implements TabAPI {
 					color buttonColor = c_colorlist[i-(c_colorlist.length * floor(i / c_colorlist.length))];
 					drawButton("▲", c_sidebar, buttonColor, iL + iW - (40 * uimult), sT + (uH * tHnow), 20 * uimult, iH, tH);
 
-					// Down button
-					drawButton((graphAssignment[i] < graphMode + 1)? "▼":"", c_sidebar, buttonColor, iL + iW - (20 * uimult), sT + (uH * tHnow), 20 * uimult, iH, tH);
+					// Down button (or remove if in Hidden section)
+					drawButton((graphAssignment[i] < graphMode + 1)? "▼":"x", c_sidebar, buttonColor, iL + iW - (20 * uimult), sT + (uH * tHnow), 20 * uimult, iH, tH);
 
 					drawRectangle(c_sidebar_divider, iL + iW - (20 * uimult), sT + (uH * tHnow) + (1 * uimult), 1 * uimult, iH - (2 * uimult));
 					tHnow++;
@@ -1370,12 +1407,21 @@ class LiveGraph implements TabAPI {
 
 						if (menuXYclick(xcoord, ycoord, sT, uH, iH, tHnow, iL, iW)){
 
-							// Down arrow
+							// Down arrow or Remove button
 							if (menuXclick(xcoord, iL + iW - int(20 * uimult), int(20 * uimult))) {
-								graphAssignment[i]++;
-								if (graphAssignment[i] > graphMode + 1) graphAssignment[i] = graphMode + 1;
-								redrawUI = true;
-								redrawContent = true;
+								if (graphAssignment[i] == graphMode + 1) {
+									if (!recordData) {
+										removeSignal(i);
+										redrawUI = true;
+										redrawContent = true;
+										break;
+									}
+								} else {
+									graphAssignment[i]++;
+									if (graphAssignment[i] > graphMode + 1) graphAssignment[i] = graphMode + 1;
+									redrawUI = true;
+									redrawContent = true;
+								}
 							}
 
 							// Up arrow

@@ -55,6 +55,12 @@ class CustomTable extends Table {
 
 			// Print the header row
 			if (hasColumnTitles()) {
+				if (recordTimestamp) {
+					writeEntryCSV(csvWriter, "Timestamp");
+					if (getColumnCount() > 0) {
+						csvWriter.print(',');
+					}
+				}
 				for (int col = 0; col < getColumnCount(); col++) {
 					if (col != 0) {
 						csvWriter.print(',');
@@ -109,6 +115,12 @@ class CustomTable extends Table {
 		try {
 			// Save the specified rows
 			for (int row = indexA; row < indexB + 1; row++) {
+				if (recordTimestamp) {
+					writeEntryCSV(csvWriter, getTimestampString());
+					if (getColumnCount() > 0) {
+						csvWriter.print(',');
+					}
+				}
 				for (int col = 0; col < getColumnCount(); col++) {
 					if (col != 0) {
 						csvWriter.print(',');

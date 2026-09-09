@@ -132,6 +132,11 @@ A full set of instructions and documentation can be found in the [**User Guide (
 </br>
 
 ## Changelog
+1. (September 2026) Version 1.7.2 [Release]
+	1. **Scientific Notation Support**: Added parsing support for exponent characters (`e` / `E`) in telemetry streams (`numberMessage()`), allowing scientific DAQs and sensors to stream values like `1.25e-3` or `4.2E+02`.
+	2. **High-Speed Baud Rates in Serial Monitor**: Extended quick baud rate menu up to `2000000` (`460800`, `500000`, `921600`, `1000000`, `2000000`) directly accessible from the Serial tab sidebar.
+	3. **Optional PC Timestamp Recording**: Added configurable `Record PC Timestamp` option in Settings. When enabled, prepends high-precision `Timestamp` (`yyyy-MM-dd HH:mm:ss.SSS`) column to CSV recordings and bracketed timestamps to TXT terminal logs.
+	4. **Remove/Purge Orphaned Signals**: Added `x` delete button in the Live Graph sidebar when a signal is moved into the "Hidden" group, allowing quick removal of unneeded signals without resetting the session.
 1. (September 2026) Version 1.7.1 [Release]
 	1. **Processing 4 & Java 17 Compatibility**: Fully adapted to run on modern Processing 4.x (tested on Processing 4.5.6 with OpenJDK 17).
 	2. **Replaced JavaFX with Java Swing**: Reimplemented `FxDialogs.pde` using native `JOptionPane` modal dialogs, eliminating the missing `javafx` library failure on Processing 4.
