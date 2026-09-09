@@ -61,6 +61,12 @@ You can also launch the program directly via command line using `processing-java
 ```bash
 processing-java --sketch=ProcessingGrapher --run
 ```
+### Linux Desktop Launcher & Dock Integration
+To install the application shortcut and high-resolution icon into your desktop menu and dock:
+```bash
+./install-desktop-shortcut.sh
+```
+This registers `processing-grapher.desktop` and sets `StartupWMClass=processing-core-PApplet` so that GNOME Shell / Ubuntu Dock displays the official magenta graph icon when running.
 </br>
 </br>
 
