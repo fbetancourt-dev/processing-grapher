@@ -7,7 +7,9 @@ This project is a Processing-based serial terminal and graphing program for the 
 
 Please let me know if you come across any issues or bugs which need to be fixed!
 
-A full description and set of instructions can be found on my website: [https://wired.chillibasket.com/processing-grapher/](https://wired.chillibasket.com/processing-grapher/)
+> **Note**: This fork is updated specifically for **Processing 4.x (Java 17)**. For legacy Processing 3.x environments, please use the original [upstream repository](https://github.com/chillibasket/processing-grapher).
+
+A full description and set of instructions can be found on the original website: [https://wired.chillibasket.com/processing-grapher/](https://wired.chillibasket.com/processing-grapher/)
 </br>
 </br>
 
@@ -45,7 +47,7 @@ A full description and set of instructions can be found on my website: [https://
 ## Installation/Setup Guide
 
 ### Basic Usage in the Processing IDE
-1. Download and install **Processing 4** (or Processing 3.5.4+) from [https://processing.org/](https://processing.org/download). This version is updated and fully compatible with **Processing 4.x (Java 17)**.
+1. Download and install **Processing 4** from [https://processing.org/download](https://processing.org/download). This version of ProcessingGrapher requires **Processing 4.x (Java 17)**.
 1. Clone or download all files in this repository into your sketchbook or project folder.
 1. Open the main program file `ProcessingGrapher/ProcessingGrapher.pde` in the Processing editor. All the other files should automatically open in separate tabs.
 1. Press the **Run** button in the top-left of the Processing editor to start the program.
