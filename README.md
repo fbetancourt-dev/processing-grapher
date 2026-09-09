@@ -11,7 +11,7 @@ Please let me know if you come across any issues or bugs which need to be fixed!
 
 > **Note**: This fork is updated specifically for **Processing 4.x (Java 17)**. For legacy Processing 3.x environments, please use the original [upstream repository](https://github.com/chillibasket/processing-grapher).
 
-A full description and set of instructions can be found on the original website: [https://wired.chillibasket.com/processing-grapher/](https://wired.chillibasket.com/processing-grapher/)
+A full description and set of instructions can be found in the [**Instructions and User Guide (USER_GUIDE.md)**](USER_GUIDE.md) and on the original website: [https://wired.chillibasket.com/processing-grapher/](https://wired.chillibasket.com/processing-grapher/)
 </br>
 </br>
 
@@ -115,7 +115,7 @@ It is possible to create a stand-alone version of the program, which does not re
 	1. You can then press the up or down buttons on each signal in the sidebar to move it to a different graph.
 	1. To change options (such as graph type, x-axis and y-axis scaling) for a specific graph, click on the graph you want to edit. The options for that graph are then shown in the sidebar.
 
-A full set of instructions and documentation can be found on my website at: [https://wired.chillibasket.com/processing-grapher/](https://wired.chillibasket.com/processing-grapher/)
+A full set of instructions and documentation can be found in the [**User Guide (USER_GUIDE.md)**](USER_GUIDE.md) and on the original website at: [https://wired.chillibasket.com/processing-grapher/](https://wired.chillibasket.com/processing-grapher/)
 </br>
 </br>
 
