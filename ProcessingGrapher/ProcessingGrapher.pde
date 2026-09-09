@@ -257,13 +257,17 @@ void setupProgram() {
 		JFrame jf = (JFrame) ((processing.awt.PSurfaceAWT.SmoothCanvas) nativeSurface).getFrame();
 		Dimension d = new Dimension(600, 350);
 		jf.setMinimumSize(d);
+		try {
+			java.awt.Image iconImg = java.awt.Toolkit.getDefaultToolkit().getImage(dataPath("icon-72.png"));
+			jf.setIconImage(iconImg);
+		} catch (Exception e) {}
 	}
 
     // Ensure window close event is called properly
 	dh = new DisposeHandler(this);
 
 	// Add window title and icon
-	surface.setIcon(loadImage("icon-48.png"));
+	surface.setIcon(loadImage("icon-72.png"));
 	surface.setTitle("Processing Grapher");
 	mainCanvas = g;
 
