@@ -45,20 +45,29 @@ A full description and set of instructions can be found on my website: [https://
 ## Installation/Setup Guide
 
 ### Basic Usage in the Processing IDE
-1. Download and install the Processing IDE version 3.5.4 from [https://processing.org/](https://processing.org/releases). Note that the newer versions >4.0 are not yet supported.
-1. Clone or download all files in this repository.
-1. Open the main program file `ProcessingGrapher.pde` in the Processing editor. All the other files should automatically open in separate tabs in the Processing IDE.
-1. Press the `Run` button in the top-left of the Processing editor to start the program.
+1. Download and install **Processing 4** (or Processing 3.5.4+) from [https://processing.org/](https://processing.org/download). This version is updated and fully compatible with **Processing 4.x (Java 17)**.
+1. Clone or download all files in this repository into your sketchbook or project folder.
+1. Open the main program file `ProcessingGrapher/ProcessingGrapher.pde` in the Processing editor. All the other files should automatically open in separate tabs.
+1. Press the **Run** button in the top-left of the Processing editor to start the program.
 </br>
 </br>
 
-### Using the Program on Linux
-To use the program on Linux, there are two additional steps that need to be taken:
-1. Change the renderer on line 218 to `final String activeRenderer = JAVA2D`. Unfortunately the renderer used on the other platforms (JavaFX) currently has some compatibility issues on Linux.
-2. If the error message `Permission Denied` appears when trying to connect to a serial port, this means that your current user account doesn't have the permissions set up to access the serial ports. To solve you can either run the program using `sudo`, or you can set up your user so that it has access to the ports using these two commands (replace `<user>` with the account username):
-	- `sudo usermod -a -G dialout <user>`
-	- `sudo usermod -a -G tty <user>` 
-	- Reboot the computer to apply the changes. 
+### Running from Terminal / Command Line
+You can also launch the program directly via command line using `processing-java`:
+```bash
+processing-java --sketch=ProcessingGrapher --run
+```
+</br>
+</br>
+
+### Linux Setup & Permissions
+1. **Renderer:** The sketch uses `JAVA2D` by default (`final String activeRenderer = JAVA2D;`). This avoids JavaFX dependencies and ensures smooth, stable rendering across all Linux desktop environments (X11 and Wayland).
+2. **Serial Port Permissions:** If the error message `Permission Denied` appears when trying to connect to a serial port, add your user to the `dialout` and `tty` groups:
+	```bash
+	sudo usermod -a -G dialout $USER
+	sudo usermod -a -G tty $USER
+	```
+	Log out and back in (or restart) to apply the permission changes.
 </br>
 </br>
 
@@ -113,6 +122,12 @@ A full set of instructions and documentation can be found on my website at: [htt
 </br>
 
 ## Changelog
+1. (September 2026) Version 1.7.1 [Release]
+	1. **Processing 4 & Java 17 Compatibility**: Fully adapted to run on modern Processing 4.x (tested on Processing 4.5.6 with OpenJDK 17).
+	2. **Replaced JavaFX with Java Swing**: Reimplemented `FxDialogs.pde` using native `JOptionPane` modal dialogs, eliminating the missing `javafx` library failure on Processing 4.
+	3. **Native JAVA2D Default Renderer**: Configured `JAVA2D` as the default renderer for smooth, crash-free execution on Linux and other platforms.
+	4. **Universal Font Support**: Updated UI font to `SansSerif` to eliminate missing font warnings on Linux distributions without `Lucida Sans`.
+	5. **CLI & Automation Support**: Standardized file dialog callbacks to support both Processing IDE and headless CLI execution via `processing-java`.
 1. (28th April 2024) Version 1.7.0 [Release]
 	1. ([#44](https://github.com/chillibasket/processing-grapher/issues/44)) Fixed issue where X-axis data was not being plotted correctly.
 	2. ([#43](https://github.com/chillibasket/processing-grapher/issues/43)) Implemented settings option allowing the serial data separator character to be changed.

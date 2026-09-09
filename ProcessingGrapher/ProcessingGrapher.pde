@@ -31,7 +31,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-final String versionNumber = "1.7.0";
+final String versionNumber = "1.7.1";
 
 // Swing for input popups
 import static javax.swing.JOptionPane.*;
@@ -57,13 +57,6 @@ import java.io.File;
 // Resizeable windows
 import javax.swing.JFrame;
 import java.awt.Dimension;
-import processing.awt.PSurfaceAWT.SmoothCanvas;
-
-// Java FX imports
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
-import javafx.scene.canvas.Canvas;
-import javafx.application.Platform;
 import java.lang.reflect.*;
 
 
@@ -72,7 +65,7 @@ import java.lang.reflect.*;
 float uimult = 1.0;
 
 // Fonts
-final String programFont = "Lucida Sans";
+final String programFont = "SansSerif";
 final String terminalFont = "Inconsolata-SemiBold.ttf";
 
 // Predefined colors
@@ -209,16 +202,14 @@ boolean alertActive = false;
 // Exit handler
 DisposeHandler dh;
 
-// JavaFX pop-up dialogues
-Stage stage;
-FileChooser fileChooser;
+// Window & Dialogue parameters
 File currentDirectory = null;
 String userInputString = null;
 int startTime;
 PGraphics mainCanvas;
 
-// Options are: FX2D (Recommended for Windows and Mac), JAVA2D (Recommended for Linux)
-final String activeRenderer = FX2D;
+// Renderer: JAVA2D for cross-platform stability in Processing 4
+final String activeRenderer = JAVA2D;
 
 
 
@@ -239,8 +230,6 @@ final String activeRenderer = FX2D;
  * function after the loading screen is drawn.
  */
 void setup() {
-	println("'processing.awt.PSurfaceAWT': This warning is a known issue and doesn't affect the program");
-
 	// Set up the window and rendering engine
 	size(1000, 700, activeRenderer);
 	smooth();
@@ -262,20 +251,10 @@ void setup() {
 void setupProgram() {
 	startTime = millis();
 
-	// Java FX specific setup
-	if (activeRenderer == FX2D) {
-		stage = (Stage) ((Canvas) surface.getNative()).getScene().getWindow();
-		fileChooser = new FileChooser(); 
-
-		// Minimum Window Size
-		stage.setMinWidth(600);
-    	stage.setMinHeight(350);
-
-    // Java default renderer specific setup
-	} else if (activeRenderer == JAVA2D) {
-		// Minimum Window Size
-		SmoothCanvas sc = (SmoothCanvas) getSurface().getNative();
-		JFrame jf = (JFrame) sc.getFrame();
+	// Minimum Window Size for Java2D
+	Object nativeSurface = getSurface().getNative();
+	if (nativeSurface instanceof processing.awt.PSurfaceAWT.SmoothCanvas) {
+		JFrame jf = (JFrame) ((processing.awt.PSurfaceAWT.SmoothCanvas) nativeSurface).getFrame();
 		Dimension d = new Dimension(600, 350);
 		jf.setMinimumSize(d);
 	}
@@ -1985,25 +1964,8 @@ void checkSerialPortList() {
  * @return The user input data
  */
 String myShowInputDialog(final String heading, final String message, final String defaultText) {
-	if (activeRenderer == FX2D) {
-		userInputString = "";
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				userInputString = trim(FxDialogs.showTextInput(heading, message, defaultText));
-			}
-		});
-
-		// Wait for the user response
-		while (programActive && userInputString == "" && userInputString != null) {
-			delay(200);
-		}
-
-		return userInputString;
-		
-	} else {
-		return trim(showInputDialog(heading + "\n" + message, defaultText));
-	}
+	String res = FxDialogs.showTextInput(heading, message, defaultText);
+	return res != null ? trim(res) : null;
 }
 
 
@@ -2016,6 +1978,7 @@ String myShowInputDialog(final String heading, final String message, final Strin
 
 	// If a file was actually selected
 	if (selection != null) {
+		currentDirectory = selection.getParentFile();
 
 		// Send it over to the tabs that require it
 		for (TabAPI curTab : tabObjects) {
@@ -2039,77 +2002,25 @@ String myShowInputDialog(final String heading, final String message, final Strin
 
 /**
  * Override the Processing "selectOutput" function
- * 
- * This function opens the Save File Dialogue, overriding
- * the default behaviour to use the native JavaFX file dialogue
- * when using the FX2D renderer.
  *
  * @param  message        The title of the Save File Dialogue
  * @param  callbackMethod Function to call when dialogue is submitted
  */
 @Override
 void selectOutput(final String message, final String callbackMethod) {
-	if (activeRenderer == FX2D) {
-		fileChooser.setTitle(message);
-
-		if (currentDirectory != null)
-			fileChooser.setInitialDirectory(currentDirectory);
-
-		fileChooser.getExtensionFilters().clear();
-		if (message.contains("CSV")) {
-			fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Comma Separated", "*.csv"));
-		} else if (message.contains("TXT")) {
-			fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text File", "*.txt"));
-		}
-
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				File file = fileChooser.showSaveDialog(stage); 
-				mySelectCallback(file, callbackMethod);
-			}
-		});
-	} else {
-		selectOutput(message, callbackMethod, null);
-	}
+	selectOutput(message, callbackMethod, null);
 }
 
 
 /**
  * Override the Processing "selectInput" function
- * 
- * This function opens the Open File Dialogue, overriding
- * the default behaviour to use the native JavaFX file dialogue
- * when using the FX2D renderer.
  *
  * @param  message        The title of the Open File Dialogue
  * @param  callbackMethod Function to call when dialogue is submitted
  */
 @Override
 void selectInput(final String message, final String callbackMethod) {
-	if (activeRenderer == FX2D) {
-		fileChooser.setTitle(message);
-
-		if (currentDirectory != null)
-			fileChooser.setInitialDirectory(currentDirectory);
-		
-		fileChooser.getExtensionFilters().clear();
-		if (message.contains("CSV")) {
-			fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Comma Separated", "*.csv"));
-		} else if (message.contains("TXT")) {
-			fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text File", "*.txt"));
-		}
-
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				File file = fileChooser.showOpenDialog(stage); 
-				mySelectCallback(file, callbackMethod);
-			}
-		});
-	} else {
-		selectInput(message, callbackMethod, currentDirectory);
-	}
+	selectInput(message, callbackMethod, currentDirectory);
 }
 
 

@@ -1,94 +1,45 @@
 /**
- * Helper Functions for Java FX Popup Dialogues
+ * Helper Functions for Popup Dialogues using Java Swing
+ * (Adapted for Processing 4 compatibility without JavaFX)
  *
  * @file  FxDialogs.pde
  */
 
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.TextInputDialog;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.input.KeyCode;
-//import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
-import javafx.stage.StageStyle;
-
-import java.awt.*;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
+import javax.swing.JOptionPane;
+import javax.swing.JTextArea;
+import javax.swing.JScrollPane;
+import java.awt.Dimension;
 
 /**
- * @class Java FX Pop-up Dialogues
+ * @class Java Swing Pop-up Dialogues (replaces legacy FxDialogs)
  */
 public static class FxDialogs {
 
     public static void showInformation(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.initStyle(StageStyle.UTILITY);
-        alert.setTitle("Information");
-        alert.setHeaderText(title);
-        alert.setContentText(message);
-
-        alert.showAndWait();
+        JOptionPane.showMessageDialog(null, message, title, JOptionPane.INFORMATION_MESSAGE);
     }
 
     public static void showWarning(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.initStyle(StageStyle.UTILITY);
-        alert.setTitle("Warning");
-        alert.setHeaderText(title);
-        alert.setContentText(message);
-
-        alert.showAndWait();
+        JOptionPane.showMessageDialog(null, message, title, JOptionPane.WARNING_MESSAGE);
     }
 
     public static void showError(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.initStyle(StageStyle.UTILITY);
-        alert.setTitle("Error");
-        alert.setHeaderText(title);
-        alert.setContentText(message);
-
-        alert.showAndWait();
+        JOptionPane.showMessageDialog(null, message, title, JOptionPane.ERROR_MESSAGE);
     }
 
     public static void showException(String title, String message, Exception exception) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.initStyle(StageStyle.UTILITY);
-        alert.setTitle("Exception");
-        alert.setHeaderText(title);
-        alert.setContentText(message);
-
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
+        java.io.StringWriter sw = new java.io.StringWriter();
+        java.io.PrintWriter pw = new java.io.PrintWriter(sw);
         exception.printStackTrace(pw);
         String exceptionText = sw.toString();
 
-        Label label = new Label("Details:");
-
-        TextArea textArea = new TextArea(exceptionText);
+        JTextArea textArea = new JTextArea(exceptionText);
         textArea.setEditable(false);
-        textArea.setWrapText(true);
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        scrollPane.setPreferredSize(new Dimension(500, 250));
 
-        textArea.setMaxWidth(Double.MAX_VALUE);
-        textArea.setMaxHeight(Double.MAX_VALUE);
-        GridPane.setVgrow(textArea, Priority.ALWAYS);
-        GridPane.setHgrow(textArea, Priority.ALWAYS);
-
-        GridPane expContent = new GridPane();
-        expContent.setMaxWidth(Double.MAX_VALUE);
-        expContent.add(label, 0, 0);
-        expContent.add(textArea, 0, 1);
-
-        alert.getDialogPane().setExpandableContent(expContent);
-
-        alert.showAndWait();
+        Object[] params = {message, scrollPane};
+        JOptionPane.showMessageDialog(null, params, title, JOptionPane.ERROR_MESSAGE);
     }
 
     public static final String YES = "Yes";
@@ -97,60 +48,32 @@ public static class FxDialogs {
     public static final String CANCEL = "Cancel";
 
     public static String showConfirm(String title, String message, String... options) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.initStyle(StageStyle.UTILITY);
-        alert.setTitle("Choose an option");
-        alert.setHeaderText(title);
-        alert.setContentText(message);
-
-        //To make enter key press the actual focused button, not the first one. Just like pressing "space".
-        /*
-        alert.getDialogPane().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            if (event.getCode().equals(KeyCode.ENTER)) {
-                event.consume();
-                try {
-                    Robot r = new Robot();
-                    r.keyPress(java.awt.event.KeyEvent.VK_SPACE);
-                    r.keyRelease(java.awt.event.KeyEvent.VK_SPACE);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });*/
-
         if (options == null || options.length == 0) {
             options = new String[]{OK, CANCEL};
         }
-
-        List<ButtonType> buttons = new ArrayList<ButtonType>();
-        for (String option : options) {
-            buttons.add(new ButtonType(option));
-        }
-
-        alert.getButtonTypes().setAll(buttons);
-
-        Optional<ButtonType> result = alert.showAndWait();
-        if (!result.isPresent()) {
-            return CANCEL;
+        int result = JOptionPane.showOptionDialog(
+            null,
+            message,
+            title,
+            JOptionPane.DEFAULT_OPTION,
+            JOptionPane.QUESTION_MESSAGE,
+            null,
+            options,
+            options[0]
+        );
+        if (result >= 0 && result < options.length) {
+            return options[result];
         } else {
-            return result.get().getText();
+            return CANCEL;
         }
     }
 
     public static String showTextInput(String title, String message, String defaultValue) {
-        TextInputDialog dialog = new TextInputDialog(defaultValue);
-        dialog.initStyle(StageStyle.UTILITY);
-        dialog.setTitle("Input");
-        dialog.setHeaderText(title);
-        dialog.setContentText(message);
-
-        Optional<String> result = dialog.showAndWait();
-        if (result.isPresent()) {
-            return result.get();
+        Object res = JOptionPane.showInputDialog(null, message, title, JOptionPane.QUESTION_MESSAGE, null, null, defaultValue);
+        if (res != null) {
+            return res.toString();
         } else {
             return null;
         }
-
     }
-
 }
