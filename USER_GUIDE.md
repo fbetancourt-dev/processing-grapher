@@ -1,369 +1,285 @@
-# Processing Grapher: Complete User Guide & Instructions
+# Instructions and User Guide
 
-A comprehensive reference manual and operating guide for **Processing Grapher**, a real-time serial telemetry monitor, multi-channel plotter, and offline waveform analysis tool built for microcontrollers (Arduino, ESP32, STM32, Teensy, Raspberry Pi Pico) and serial devices.
-
-Original software and design by **Simon Bluett** ([wired.chillibasket.com](https://wired.chillibasket.com/processing-grapher/)).  
-Maintained and modernized for **Processing 4.x (Java 17)** by [Francisco Betancourt](https://github.com/fbetancourt-dev/processing-grapher).
+> **Processing Grapher** is a serial monitor and real-time plotting software designed for analyzing serial telemetry and sensor data from microcontrollers (Arduino, ESP32, STM32, Teensy, RP2040) and recording that data to files.  
+> Original guide & software by **Simon Bluett** ([wired.chillibasket.com](https://wired.chillibasket.com/processing-grapher/)).  
+> Modernized for **Processing 4.x (Java 17)** by [Francisco Betancourt](https://github.com/fbetancourt-dev/processing-grapher).
 
 ---
 
 ## Table of Contents
 
-1. [Introduction](#introduction)
-2. [Quick Start & Setup](#quick-start--setup)
-3. [Microcontroller Setup & Telemetry Protocol](#microcontroller-setup--telemetry-protocol)
-4. [Tab 1: Serial Monitor](#tab-1-serial-monitor)
+1. [Installation & Setup](#installation--setup)
+2. [The “Serial” Monitor Tab](#the-serial-monitor-tab)
    - [Connecting to a Serial Device](#connecting-to-a-serial-device)
-   - [Interactive Terminal Console](#interactive-terminal-console)
-   - [Filtering & Hiding Graph Telemetry](#filtering--hiding-graph-telemetry)
-   - [Keyword Color Tagging](#keyword-color-tagging)
-   - [Text Selection & Clipboard](#text-selection--clipboard)
-   - [Logging & Recording Serial Messages](#logging--recording-serial-messages)
-5. [Tab 2: Live Graphing (Real-Time Plotting)](#tab-2-live-graphing-real-time-plotting)
-   - [Message Protocol](#message-protocol)
-   - [Multi-Graph Splitting (1 to 4 Graphs)](#multi-graph-splitting-1-to-4-graphs)
-   - [Signal Routing & Reordering](#signal-routing--reordering)
-   - [Custom X-Axis (XY Plotting)](#custom-x-axis-xy-plotting)
-   - [Sample Rate & Auto-Detection](#sample-rate--auto-detection)
-   - [Graph Display & Scaling Modes](#graph-display--scaling-modes)
-   - [Pause, Resume & Clear Data](#pause-resume--clear-data)
-   - [Recording Live Telemetry to CSV](#recording-live-telemetry-to-csv)
-   - [Sending Serial Commands from Live Graph](#sending-serial-commands-from-live-graph)
-6. [Tab 3: File Graph Analysis (Offline Inspection)](#tab-3-file-graph-analysis-offline-inspection)
-   - [Loading and Inspecting CSV Data](#loading-and-inspecting-csv-data)
-   - [Custom X-Axis Header Convention](#custom-x-axis-header-convention)
-   - [Interactive Bounding-Box Zoom](#interactive-bounding-box-zoom)
-   - [Vertical Marker Labels](#vertical-marker-labels)
-   - [Digital Signal Processing (DSP) & Math Filters](#digital-signal-processing-dsp--math-filters)
-   - [Exporting Filtered Datasets](#exporting-filtered-datasets)
-7. [Application Settings & Preferences](#application-settings--preferences)
-   - [UI Scaling & Dynamic Zoom](#ui-scaling--dynamic-zoom)
-   - [Color Themes](#color-themes)
-   - [Delimiters and Line Endings](#delimiters-and-line-endings)
-   - [Diagnostic Overlay](#diagnostic-overlay)
-8. [Keyboard Shortcuts Cheat Sheet](#keyboard-shortcuts-cheat-sheet)
-9. [Troubleshooting & Linux Permissions](#troubleshooting--linux-permissions)
+   - [Terminal Console Area](#terminal-console-area)
+   - [Recording Received Messages to a File](#recording-received-messages-to-a-file)
+   - [Adding Colour Keyword Tags](#adding-colour-keyword-tags)
+3. [The “Live Graph” Serial Plotting Tab](#the-live-graph-serial-plotting-tab)
+   - [Message Format for Real-time Plotting](#message-format-for-real-time-plotting)
+   - [Arduino Telemetry Code Example](#arduino-telemetry-code-example)
+   - [Format the Signals and Graphs](#format-the-signals-and-graphs)
+   - [Recording Signals to a CSV File](#recording-signals-to-a-csv-file)
+   - [Changing Graph Settings](#changing-graph-settings)
+   - [Sending a Serial Message / Command](#sending-a-serial-message--command)
+4. [The “File Graph” Analysis Tab](#the-file-graph-analysis-tab)
+   - [Opening and Saving Files](#opening-and-saving-files)
+   - [Formatting the Signals](#formatting-the-signals)
+   - [Changing Graph Settings (Zoom & Scale)](#changing-graph-settings-zoom--scale)
+   - [Adding Labels and Filtering the Data](#adding-labels-and-filtering-the-data)
+5. [Settings Menu](#settings-menu)
+   - [Main Program Settings](#main-program-settings)
+   - [Advanced Serial Port Settings](#advanced-serial-port-settings)
+   - [Serial Port Information Bar](#serial-port-information-bar)
+6. [Keyboard Shortcuts Reference](#keyboard-shortcuts-reference)
+7. [Linux Setup & Permissions](#linux-setup--permissions)
 
 ---
 
-## Introduction
+## Installation & Setup
 
-When developing embedded firmware and sensor prototypes, standard terminal monitors such as the Arduino IDE Serial Monitor often lack critical tools for quantitative signal validation. 
+### Running with Processing 4
+1. Download and install **Processing 4** from [https://processing.org/download](https://processing.org/download). This version requires **Processing 4.x (Java 17)**.
+2. Clone or download the program files from the [GitHub repository](https://github.com/fbetancourt-dev/processing-grapher).
+3. Open `ProcessingGrapher/ProcessingGrapher.pde` in the Processing 4 editor. All additional PDE tabs will automatically open.
+4. Click the **Run** button (top-left) or press `Ctrl+R`.
 
-**Processing Grapher** bridges this gap by providing:
-- High-throughput serial terminal logging with regex/keyword highlighting.
-- Real-time plotting across up to 4 concurrent, independently scaled charts.
-- Non-blocking streaming directly to comma-separated value (CSV) files.
-- Advanced offline waveform inspection with signal filtering, FFT spectrum analysis, and hysteresis loop integration.
+### Running from Terminal
+```bash
+processing-java --sketch=/path/to/ProcessingGrapher --run
+```
 
-![](Images/LiveGraph_tab.jpg)
-
----
-
-## Quick Start & Setup
-
-### Requirements
-- **Processing 4.x** (tested on Processing 4.5.6 with Java 17).
-- Operating System: Linux (Ubuntu/Debian, Fedora, Arch), macOS, or Windows 10/11.
-
-### Running the Program
-1. **Via Processing IDE:**
-   - Open `ProcessingGrapher/ProcessingGrapher.pde` in Processing 4.
-   - Click the **Run** button (or press `Ctrl+R`).
-2. **Via Command Line:**
-   ```bash
-   processing-java --sketch=/path/to/ProcessingGrapher --run
-   ```
-3. **Linux Desktop Shortcut:**
-   Run the included installation script to add the desktop shortcut and system icon:
-   ```bash
-   ./install-desktop-shortcut.sh
-   ```
+### Linux Desktop Launcher & Dock Icon
+To install the application shortcut and official magenta graph icon into your application menu and dock:
+```bash
+./install-desktop-shortcut.sh
+```
 
 ---
 
-## Microcontroller Setup & Telemetry Protocol
+## The “Serial” Monitor Tab
 
-To transmit multi-channel real-time telemetry to Processing Grapher:
-1. Values must be separated by a delimiter (default is comma `,`).
-2. Each sample frame must terminate with a newline character (`\n` or `\r\n`).
-3. Samples must be sent at a stable, periodic rate.
+![](Images/SerialMonitor_Labels.jpg)  
+*__Figure 1:__ The “Serial Monitor” tab, with all the main functions labelled.*
 
-### Recommended Arduino / ESP32 Example (Non-blocking 100 Hz)
+### Connecting to a Serial Device
+- **Select Port:** Select the **Port** relating to the device you want to connect to from the sidebar dropdown. The port list will automatically update when new devices are plugged into the computer.
+- **Set Baud Rate:** Set the **Baud rate** for the serial communication. The most common rates used with Arduinos are `9600` or `115200` (extended baud rates up to `2000000` are supported).
+- **Connect / Disconnect:** Press the **Connect/Disconnect** button to begin and end communication with the serial device. When disconnecting, make sure to hit the disconnect button before you unplug the device! Otherwise the serial port list won’t update properly anymore! *(Shortcut: `CTRL-Q`)*
+
+### Terminal Console Area
+- **Sending Messages:** You can send a new message to the connected device by simply typing on the keyboard. Use the left and right arrow keys to edit different parts of the message. To send the message, press the **Enter/Return** key.
+- **Console Display:** The terminal console area displays all the sent and received serial messages.
+- **Clear Terminal:** Press the **Clear Terminal** button to remove all messages currently displayed in the terminal console.
+- **Autoscroll:** The text displayed in the terminal console will automatically scroll down when new messages are received from the device. Press the **Autoscroll: On/Off** button to enable or disable this scrolling.
+- **Hide Graph Data:** If the messages contain a mixture of graph data (comma-separated numbers) and other text, the graph data values can be hidden by toggling **Hide Graph Data** to make the other text easier to see.
+- **Scroll Memory Jump:** When scrolled up to inspect previous logs, a button appears at the bottom-right which scrolls the serial terminal back down to the most recent message.
+- **Text Selection & Clipboard:** Text can be selected with the mouse and copied using `CTRL-C`. Text can also be pasted into the input field using `CTRL-V`. Use `CTRL-A` to select all text.
+
+### Recording Received Messages to a File
+- The program makes it easy to save all messages received from the serial device to a text file, where each message is saved on a new line.
+- Press the **Set Output File** button to set where the recorded messages will be saved. *(Shortcut: `CTRL-S`)*
+- Press **Start/Stop Recording** button to start and end the serial message recording process. *(Shortcut: `CTRL-R`)*
+- The output file path where the recorded messages will be saved is shown in the bottom status bar.
+
+### Adding Colour Keyword Tags
+The terminal console has a unique feature that it can change the colour of lines which contain specific text or keywords. If you receive a lot of serial messages, this can make it a lot easier to spot the important messages you are looking for.
+
+- Press the **Add New Tag** button to add a new colour keyword tag. A pop-up will appear where you can type the text you want to detect.
+- All the existing colour tags are listed at the bottom of the right-hand menu.
+- You can click on the name of the tag to edit it.
+- To delete the tag, click on the **x** button.
+- To change the colour of a specific tag, click on the coloured box next to the tag name. An options menu will appear where a custom colour can be chosen.
+
+---
+
+## The “Live Graph” Serial Plotting Tab
+
+### Message Format for Real-time Plotting
+To plot real-time signals received from the serial device, the messages being received need to follow a specific format:
+- Each message must contain the current values of all of the signals you want to plot, separated by commas.
+- The message must end with the **New Line (`\n`)** character.
+- The messages need to be sent at regular time-intervals.
+- The message cannot contain any other characters which are not numbers or commas…
+
+When listed like this it sounds confusing, but in practice it is actually very simple! For example, this would be the Arduino code used to plot the Analog Pin values 100 times a second:
+
+### Arduino Telemetry Code Example
 
 ```cpp
-/*
- * Processing Grapher Real-time Telemetry Example
- * Transmits 3 analog/sensor channels at 100 Hz (every 10 ms).
- */
+// Variable used to run code at regular intervals
+unsigned long updateTime = 0;
 
-const unsigned long SAMPLE_INTERVAL_MS = 10;
-unsigned long lastSampleTime = 0;
-
-void setup() {
-  Serial.begin(115200);
-  while (!Serial && millis() < 3000) {
-    // Wait for native USB if using Leonardo, SAMD, Teensy, or ESP32-S3
-  }
+void setup () {	
+  // Open up the serial port
+  Serial.begin(9600);
 }
 
-void loop() {
-  unsigned long currentTime = millis();
+void loop () {
+  // If it is time to check the sensors again
+  // 10ms delay = frequency of 100Hz
+  if (millis() - updateTime >= 10) {
+    updateTime = millis();
 
-  if (currentTime - lastSampleTime >= SAMPLE_INTERVAL_MS) {
-    lastSampleTime = currentTime;
+    // Read the analog inputs
+    int a0pin = analogRead(A0);
+    int a1pin = analogRead(A1);
+    int a2pin = analogRead(A2);
 
-    // Read or compute sensor values
-    int ch1 = analogRead(A0);
-    float ch2 = sin(currentTime * 0.005f) * 500.0f + 512.0f;
-    int ch3 = analogRead(A1);
-
-    // Format: "val1,val2,val3\n"
-    Serial.print(ch1);
+    // Send the values via serial
+    Serial.print(a0pin);
     Serial.print(",");
-    Serial.print(ch2, 2);
+    Serial.print(a1pin);
     Serial.print(",");
-    Serial.println(ch3); // println transmits the terminating newline
+    Serial.println(a2pin);
   }
 }
 ```
 
-> **Note:** Use `Serial.print(",")` for separators and `Serial.println(...)` exclusively on the final signal. Do not append trailing commas before the newline.
+![](Images/LiveGraph_Labels.jpg)  
+*__Figure 2:__ “Live Graph” tab that plots serial data in real-time*
+
+### Format the Signals and Graphs
+- **Pause & Resume:** The live data on the graphs can be paused and resumed using the buttons in the sidebar. All the old data displayed on the graph can also be cleared using the **Clear** button.
+- **Multi-Graph Split:** The program can display incoming signals on up to 4 separate graphs. To change the number of graphs, click on the **1**, **2**, **3** or **4** button next to the **Split** label.
+- **Frequency / Data Rate:** By default the program automatically detects the frequency/rate of the data being received. This is used to automatically show the correct time scale on the X-axis of the graph. This frequency can be manually changed by clicking on the **Rate:** button and entering a new number. Leave the input blank to return to the automatic detection mode.
+- **Signal List & Ordering:** At the bottom of the right-hand menu, all of the automatically detected signals and their respective colours are listed:
+  - You can click on the signal name to change the name to something different. *Note: this option is disabled once data recording has been started.*
+  - Click on the **up (▲)** and **down (▼)** arrow buttons to move the signals onto different graphs.
+  - If you click the up arrow from **“Graph 1”**, then that signal will be used as the **X-axis** for all the other signals (enabling XY / phase plots).
+
+### Recording Signals to a CSV File
+- The program makes it easy to save all messages received from the serial device to a CSV (comma-separated values) data file, which can opened in spreadsheets (Excel, Calc) or MATLAB/Python for further analysis.
+- Press the **Set Output File** button to set where the recorded messages will be saved. *(Shortcut: `CTRL-S`)*
+- Press **Start/Stop Recording** button to start and end the serial message recording process. *(Shortcut: `CTRL-R`)*
+- The output file path where the recorded messages will be saved is shown in the bottom status bar.
+- For long-duration logging, files are automatically split into manageable chunks of 100,000 rows.
+
+### Changing Graph Settings
+- To change the settings associated with a specific graph, click anywhere on the graph to select it. The title of the graph will turn red to show that it has been selected. The number of the selected graph is also shown in the menu: **Graph X - Options**.
+- You can change the way in which the data is displayed on the graph by clicking the **Line** (line graph), **Dots** (scatter graph) or **Bar** (bar chart) buttons.
+- **Manual Axis Limits:** If the value of the signals exceeds the current y-axis scaling, the minimum and maximum y-axis values will automatically be increased so that all the data fits onto the graph. However, you can also manually change the minimum and maximum Y- and X-axis values by clicking on the X and Y numbers in the menu.
+- **Scaling Modes:** To prevent the graph Y-axis scale from resizing automatically if the data exceeds the graph bounds, click on this button to change between:
+  - **`Scale: Auto Expand`**: graph y-axis is increased if data exceeds the limits, but does not contract.
+  - **`Scale: Automatic`**: graph y-axis expands and contracts dynamically to fit the current visible data.
+  - **`Scale: Manual`**: user specified fixed y-axis limits.
+
+### Sending a Serial Message / Command
+While on the **“Live Graph”** tab, it is possible to send a serial message to the connected device without going to the “Serial” tab (for example if you need to keep an eye on the data being plotted on the graphs):
+- Press the **`CTRL-M`** shortcut key on your keyboard.
+- If there is a serial device connected, then a pop-up window will appear where you can type the message you want to send.
 
 ---
 
-## Tab 1: Serial Monitor
+## The “File Graph” Analysis Tab
 
-The **Serial** tab provides high-speed bi-directional ASCII communication with connected serial devices.
+![](Images/FileGraph_Labels.jpg)  
+*__Figure 3:__ The “File Graph” tab can plot data from a CSV file*
 
-![](Images/SerialMonitor_tab.jpg)
+### Opening and Saving Files
+The “File Graph” tab can be used to analyse data which you recorded earlier. This makes it easy to quickly look back at the data and look at regions of interest.
+- **Open CSV File:** To open a `*.CSV` data file, click on the **Open CSV File** button. All the signals contained within the file should be plotted on the graph. *(Shortcut: `CTRL-O`)*
+- **Save Changes:** If any changes were made to the data (such as applying a filter or adding labels), click on **Save Changes** to open a dialogue which allows you to save the data to a new file. *(Shortcut: `CTRL-S`)*
+- The location of data file which is currently open can be seen on the bottom status bar.
 
-### Connecting to a Serial Device
-1. In the right-hand sidebar, click the **Port: [None]** dropdown button to choose your detected serial device (e.g., `/dev/ttyACM0`, `/dev/ttyUSB0`, or `COM3`). The device list auto-refreshes.
-2. Click **Baud: [9600]** to select your target communication speed (e.g., `9600`, `115200`, `250000`, `500000`, `1000000`, or `2000000`).
-3. Click **Connect** (or press `Ctrl+Q`).
-4. To disconnect safely, press **Disconnect** (`Ctrl+Q`) *before* unplugging the hardware USB cable to prevent serial lockups.
+### Formatting the Signals
+- **X-Axis Detection:** To determine the X-axis of the graph, there are two options:
+  - If the data file contains a column which should be used as the X-axis, the heading of the column should start with the text: **`x:`** (e.g. `x:time,signal1,signal2`). To show that the program has detected this column, button **(4)** in the sidebar will show the name of the X-axis data column.
+  - If no X-axis is present in the data file, you can set your own data rate/frequency in the exact same way as in the “Live Graph” tab. Click on the **Rate: 100Hz** button and input the desired frequency into the pop-up window.
+- **Signal List:** All the signals contained within the file (with exception to the x-axis column, if present) are shown at the bottom of the menu bar. To remove a signal from the graph, click on the **x** button beside the signal name.
 
-### Interactive Terminal Console
-- **Sending Messages:** Type text directly into the console prompt at the bottom and press `Enter` to transmit to the microcontroller.
-- **Autoscroll:** Toggle **Autoscroll: On/Off** to pause text scrolling when reviewing historical messages.
-- **Scroll Memory Jump:** When scrolling up to inspect past logs, a quick-jump button appears at the bottom-right of the terminal to return instantly to the latest line.
-- **Clear Terminal:** Click **Clear Terminal** to purge the live display buffer.
+### Changing Graph Settings (Zoom & Scale)
+- You can change the way in which the data is displayed on the graph by clicking the **Line** (line graph), **Dots** (scatter graph) or **Bar** (bar chart) buttons.
+- You can manually change the minimum and maximum Y- and X-axis values by clicking on the X and Y numbers in the menu.
+- **Interactive Zooming:** To zoom into a specific region of the graph, click on the **Zoom** button. The mouse cursor will change to a cross. You can then click on two points on the graph, and the chart will be updated to zoom into the rectangle between those two points.
+- **Reset Zoom:** To reset the graph back to its original size, click on the **Reset** button. Press `Esc` while selecting to cancel an active zoom operation.
 
-### Filtering & Hiding Graph Telemetry
-When transmitting rapid numeric telemetry (e.g., `120,450,89`), textual debug prints (such as `"Calibration Complete"` or `"Error: Sensor Offline"`) can become difficult to read.
-- Click the **Hide Graph Data** toggle in the sidebar. Numeric telemetry lines conforming to the graph format are filtered out of the terminal view while remaining active on the **Live Graph** tab.
-
-### Keyword Color Tagging
-Highlight critical logs in real time using custom color tags:
-1. Click **Add New Tag** in the sidebar.
-2. Enter the target keyword (e.g., `ERROR`, `WARN`, `OK`, `TEMP`).
-3. Click the colored swatch next to the created tag to open the native color picker and assign a distinct hue.
-4. Any line received containing that keyword will instantly render in the assigned color.
-5. Click `x` next to any tag to remove it.
-
-### Text Selection & Clipboard
-- Drag the mouse across text in the terminal window to highlight lines.
-- Press `Ctrl+C` to copy the selected logs to your system clipboard.
-- Press `Ctrl+V` to paste text from clipboard into the transmit buffer.
-- Press `Ctrl+A` to select all visible text in the terminal.
-
-### Logging & Recording Serial Messages
-1. Click **Set Output File** (`Ctrl+S`) to select a target `.txt` or `.log` file path.
-2. Click **Start Recording** (`Ctrl+R`) to begin logging incoming serial lines.
-3. The active recording path and recorded line count are displayed in the bottom status bar.
-4. Click **Stop Recording** (`Ctrl+R`) to flush and close the file.
-
----
-
-## Tab 2: Live Graphing (Real-Time Plotting)
-
-The **Live Graph** tab renders real-time streams across up to 4 synchronized or independent graphs.
-
-![](Images/LiveGraph_tab.jpg)
-
-### Message Protocol
-Telemetry packets must be delimited numbers (e.g., `23.4,102.1,-4.5`) ending with a newline. Processing Grapher automatically parses the number of channels and creates corresponding signals.
-
-### Multi-Graph Splitting (1 to 4 Graphs)
-- In the right-hand sidebar under **Split**, click `1`, `2`, `3`, or `4`.
-- The display divides into stacked horizontal plots, allowing you to separate signals with incompatible units or amplitudes (e.g., RPM vs Temperature vs Current).
-
-### Signal Routing & Reordering
-At the bottom of the right-hand sidebar, all detected signals are displayed:
-- **Renaming Signals:** Click a signal's label to edit its display name (e.g., rename `Signal 1` to `Thermocouple`). *Note: Signal names cannot be changed while a CSV recording is active.*
-- **Moving Across Graphs:** Click the **Up (▲)** and **Down (▼)** arrow buttons next to any signal to route it to Graph 1, 2, 3, or 4.
-- **Hiding Unwanted Signals:** Move a signal below the active split or into the hidden group to prevent it from cluttering the display.
-
-### Custom X-Axis (XY Plotting)
-By default, the horizontal axis represents time in seconds.
-- You can designate one signal as the custom X-axis (creating an XY phase-space plot, such as Voltage vs Current or Pressure vs Volume).
-- Click the **Up (▲)** arrow on **Signal 1** (or the top signal on Graph 1) to assign it as the horizontal reference for all remaining signals.
-
-### Sample Rate & Auto-Detection
-- Processing Grapher automatically measures packet arrival intervals to determine frequency (e.g., `100 Hz`).
-- To override automatic calculation, click **Rate: [Auto]** in the sidebar and specify an explicit frequency in Hertz (e.g., `250`). Clear the text field to restore automatic detection.
-
-### Graph Display & Scaling Modes
-Click directly on any graph to select it (its title turns red to confirm focus). The sidebar will display **Graph X - Options**:
-- **Display Modes:**
-  - `Line`: Continuous interpolated line plot.
-  - `Dots`: Discrete scatter plot.
-  - `Bar`: Vertical column bars.
-- **Y-Axis Scaling Modes:**
-  - `Scale: Auto Expand`: The Y-axis expands if signal peaks exceed current boundaries, but does not contract.
-  - `Scale: Automatic`: The Y-axis continuously contracts and expands to fit visible data tightly.
-  - `Scale: Manual`: The graph preserves static minimum and maximum bounds. Click the minimum and maximum numeric values on the Y-axis to input exact numerical limits.
-
-### Pause, Resume & Clear Data
-- Click **Pause** in the sidebar to freeze the live display for inspection. Incoming serial data continues to be buffered and recorded in the background.
-- Click **Resume** to return to live scrolling.
-- Click **Clear** to purge existing points from memory.
-
-### Recording Live Telemetry to CSV
-1. Click **Set Output File** (`Ctrl+S`) to choose a file path and file name (e.g., `telemetry_run1.csv`).
-2. Click **Start Recording** (`Ctrl+R`). Incoming points are written to disk with high-precision timestamps.
-3. For long-duration logging, Processing Grapher automatically partitions streams every 100,000 rows to ensure file integrity and compatibility with external spreadsheet tools.
-4. Click **Stop Recording** (`Ctrl+R`) when finished.
-
-### Sending Serial Commands from Live Graph
-You do not need to switch back to the Serial tab to transmit control messages:
-- Press `Ctrl+M` anywhere in the application.
-- A popup dialog will prompt for the command string (e.g., `PID_KP=2.5` or `TARE`).
-- Press `Enter` to transmit directly over the active serial port.
+### Adding Labels and Filtering the Data
+- **Adding Labels:** Labels consist of a vertical line which can be used to mark regions of interest on the graph. To add a new label, click on the **Add Label** button (the mouse will change to a cross), and then click on the graph to place the label marker. A new signal is added to the file to record the position of the labels.
+- **Applying Filters:** Filters can be applied to the data by pressing on the **Apply a Filter** button:
+  1. Select the signal you want to filter from the list which appears.
+  2. Select a filter to apply to the data from the available options:
+     - **Noise Removal:**
+       - *Moving Average* (`avg`): Sliding window smoothing.
+       - *1D Total Variance* (`tv`): Edge-preserving denoising.
+       - *RC Low Pass* (`lp`): First-order low-pass filter (user cutoff frequency).
+       - *RC High Pass* (`hp`): High-pass filter removing DC drift.
+     - **Mathematical Functions:**
+       - *Absolute Value* (`abs`): $|x|$ rectification.
+       - *Squared* (`squ`): $x^2$ power computation.
+       - *Derivative* (`Δ/dt`): Instantaneous rate of change.
+       - *Integral* (`Σdt`): Numerical accumulation over time.
+     - **Signal Analysis:**
+       - *Fourier Transform* (`fft`): Frequency spectrum analysis.
+       - *Enclosed Area* (`ea`): Area enclosed within cyclic/hysteresis loops.
+  3. If any additional user input is required (for example to specify filter cut-off frequency), a pop-up dialogue will appear.
+  4. Once complete, the filtered signal is added as a new signal to the file.
 
 ---
 
-## Tab 3: File Graph Analysis (Offline Inspection)
+## Settings Menu
 
-The **File Graph** tab allows loading, analyzing, annotating, and filtering historical CSV datasets.
+![](Images/Menu_Labels.jpg)  
+*__Figure 4:__ The settings menu and the Serial Port information bar.*
 
-![](Images/FileGraph_tab.jpg)
+### Main Program Settings
+- **Opening Settings:** To open the main settings menu, click on the gear icon in the top-right corner of the program.
+- **Closing Settings:** Once open, the settings menu can be closed again by clicking on the **x** icon in the same location (or pressing `Esc`).
+- **UI Scaling:** The size of the entire interface and all text can be increased or decreased to suit your preference (`Ctrl +` / `Ctrl -`).
+- **Colour Schemes:** There are three colour schemes for the program which can be easily switched within the menu:
+  - **Monokai** (Dark, high contrast)
+  - **One Dark Gravity** (Dark, modern slate)
+  - **Celeste** (Bright, light mode)
+- **FPS Indicator:** A small indicator of the current frame rate of the program can be enabled or disabled.
+- **Startup Guides:** The instruction guides which are shown in the program when no serial devices are connected can be disabled.
 
-### Loading and Inspecting CSV Data
-1. Click **Open CSV File** (`Ctrl+O`) to launch the file browser.
-2. Select any valid comma-separated values file. All contained signal columns are mapped and displayed immediately.
-3. Signals are listed in the sidebar with assigned colors. Click the `x` button next to any signal to remove it from the visual chart.
-
-### Custom X-Axis Header Convention
-- If your CSV includes a time or position column, prefix its header name with `x:` (for example: `x:timestamp,voltage,current` or `x:seconds,accel_x,accel_y`).
-- Processing Grapher will automatically recognize the column as the horizontal axis rather than plotting it as an amplitude signal.
-- If no `x:` column is present, click **Rate: [100Hz]** in the sidebar to define the sampling frequency used to scale the timebase.
-
-### Interactive Bounding-Box Zoom
-1. Click the **Zoom** button in the sidebar (the cursor turns into a precision crosshair).
-2. Click and drag or click two diagonal corners across the waveform segment you wish to inspect.
-3. The graph view will zoom directly into the selected bounding box.
-4. Press `Esc` while selecting to cancel an active zoom operation.
-5. Click **Reset** in the sidebar to return to the full unzoomed view.
-
-### Vertical Marker Labels
-1. Click **Add Label** in the sidebar.
-2. Click anywhere on the waveform to place a vertical marker at that timestamp or X coordinate.
-3. A marker dialog allows naming the annotation (e.g., `"Ignition"`, `"Step Response Start"`).
-4. Placed markers are saved into the dataset as a dedicated label signal.
-
-### Digital Signal Processing (DSP) & Math Filters
-Click **Apply a Filter** in the sidebar to open the DSP filter library:
-
-#### 1. Noise Removal Filters
-- **Moving Average (`avg`):** Smooths high-frequency noise using a sliding window. Prompts for window size $N$.
-- **1D Total Variance (`tv`):** Preserves sharp transitions while attenuating stochastic noise.
-- **RC Low-Pass Filter (`lp`):** First-order infinite impulse response (IIR) low-pass filter. Prompts for cutoff frequency $f_c$.
-- **RC High-Pass Filter (`hp`):** Removes DC bias and slow drift, passing AC fluctuations above cutoff frequency $f_c$.
-
-#### 2. Mathematical Transformations
-- **Absolute Value (`abs`):** Computes $|x(t)|$, rectifying bipolar oscillations.
-- **Squared (`squ`):** Computes $x^2(t)$, useful for energy and power estimations.
-- **Derivative (`Δ/dt`):** Computes instantaneous rate of change $\frac{\Delta x}{\Delta t}$ (e.g., velocity from position).
-- **Integral (`Σdt`):** Computes discrete numerical accumulation $\sum x(t) \cdot \Delta t$ (e.g., distance from velocity).
-
-#### 3. Signal Analysis
-- **Fourier Transform (FFT) (`fft`):** Computes the frequency spectrum of the signal, plotting frequency (Hz) vs magnitude.
-- **Enclosed Area (`ea`):** For cyclic or closed XY loops (such as hysteresis, thermodynamic $P\text{-}V$ diagrams, or stress-strain cycles), calculates the total enclosed surface area via numerical line integration.
-
-*When a filter is applied, the calculated result is added as a new signal track, preserving your original raw data.*
-
-### Exporting Filtered Datasets
-- Click **Save Changes** (`Ctrl+S`) to export the modified dataset (including generated DSP tracks and markers) to a new CSV file.
-
----
-
-## Application Settings & Preferences
-
-Click the **Gear / Settings icon** in the top-right corner of the window to access global preferences.
-
-### UI Scaling & Dynamic Zoom
-- The user interface supports high-DPI displays and custom window dimensions.
-- Use the sidebar controls or press `Ctrl +` to enlarge the interface and `Ctrl -` to reduce it (scaling factor from `0.5x` to `2.0x`).
-
-### Color Themes
-Switch between 3 bundled palettes:
-- **Monokai:** High-contrast dark theme with vivid syntax accents.
-- **One Dark Gravity:** Modern dark slate theme designed for low-light lab environments.
-- **Celeste:** Clean, light palette ideal for daylight readability, exports, and presentations.
-
-### Delimiters and Line Endings
-Configure serial packet parsing to match your hardware firmware:
+### Advanced Serial Port Settings
+- Advanced settings related to the serial port configurations (parity, data bits, stop bits, custom delimiters) can be changed here *(Note: options can only be changed when the serial port is disconnected)*.
 - **Supported Delimiters:** Comma (`,`), Semicolon (`;`), Tab (`\t`), Colon (`:`), Space (` `), Underscore (`_`), Vertical Bar (`|`).
-- **Line Terminations:** `\n` (LF), `\r\n` (CRLF), or `\r` (CR).
+- **Save Settings:** All the settings within the menu can be saved, meaning that they will remain when the program is closed and started again. The settings can also easily be returned to their default values.
 
-### Diagnostic Overlay
-- Toggle **Show FPS** to display a real-time rendering frame-rate monitor in the top header.
-- Toggle **Show Startup Guides** to hide or show onboarding hint banners.
+### Serial Port Information Bar
+- On the bottom information bar of all tabs, the current serial port settings and connection status are shown.
+- The buttons can be clicked to quickly connect or disconnect the serial device and alter the port or the baud rate without switching tabs.
 
 ---
 
-## Keyboard Shortcuts Cheat Sheet
+## Keyboard Shortcuts Reference
 
-| Shortcut | Context | Action |
+| Shortcut | Scope | Function |
 |---|---|---|
-| **Ctrl + Q** | Global | Connect / Disconnect active serial port |
-| **Ctrl + Tab** | Global | Cycle to the next tab (Serial → Live Graph → File Graph) |
-| **Ctrl + S** | Serial / Live Graph | Set output file path for recording |
-| **Ctrl + S** | File Graph | Save changes and export modified CSV |
-| **Ctrl + R** | Serial / Live Graph | Start / Stop data recording toggle |
-| **Ctrl + O** | File Graph | Open CSV data file |
-| **Ctrl + M** | Global | Open quick-transmit serial command dialog |
-| **Ctrl + +** / **Ctrl + =** | Global | Increase UI scaling |
-| **Ctrl + -** / **Ctrl + _** | Global | Decrease UI scaling |
-| **Ctrl + C** | Serial Monitor | Copy selected text to clipboard |
-| **Ctrl + V** | Serial Monitor | Paste clipboard text into transmit line |
-| **Ctrl + A** | Serial Monitor | Select all lines in terminal |
-| **Esc** | File Graph / Modals | Cancel active zoom box or dismiss modal alerts |
-| **Page Up** / **Page Down** | Serial Monitor | Fast-scroll terminal history |
-| **Up** / **Down** | Right Sidebar | Scroll menus or move signal assignments |
-| **Enter** / **Return** | Serial Monitor | Transmit input text |
+| **CTRL-Q** | Global | Connect / Disconnect serial port |
+| **CTRL-TAB** | Global | Cycle to next tab (Serial → Live Graph → File Graph) |
+| **CTRL-S** | Serial / Live Graph | Set output file path for recording |
+| **CTRL-S** | File Graph | Save changes to file |
+| **CTRL-R** | Serial / Live Graph | Start / Stop recording data |
+| **CTRL-O** | File Graph | Open CSV data file |
+| **CTRL-M** | Global | Send serial message from any tab |
+| **CTRL +** / **CTRL =** | Global | Increase UI scaling |
+| **CTRL -** / **CTRL _** | Global | Decrease UI scaling |
+| **CTRL-C** | Serial Monitor | Copy highlighted text to clipboard |
+| **CTRL-V** | Serial Monitor | Paste text from clipboard |
+| **CTRL-A** | Serial Monitor | Select all text in terminal |
+| **ESC** | Modals / Zoom | Cancel zoom selection or dismiss dialog / settings |
+| **Page Up / Down** | Serial Monitor | Fast-scroll terminal console |
+| **Up / Down** | Sidebar | Move signals between graphs or scroll menus |
+| **Enter / Return** | Serial Monitor | Transmit entered serial message |
 
 ---
 
-## Troubleshooting & Linux Permissions
+## Linux Setup & Permissions
 
-### 1. `Permission Denied` on Linux Serial Ports
-On Linux systems, access to `/dev/ttyUSB*` and `/dev/ttyACM*` requires membership in the `dialout` and `tty` user groups:
+If the error message `Permission Denied` appears when trying to connect to a serial port on Linux, your user account does not have access permissions for serial hardware.
+
+Run these two commands in terminal (replace `<user>` with your username):
 ```bash
 sudo usermod -a -G dialout $USER
 sudo usermod -a -G tty $USER
 ```
-*You must log out and back in (or reboot) for group changes to take effect.*
-
-### 2. Serial Port Disappears After Disconnecting Cable
-If a USB cable is unplugged while the port is still connected, the underlying operating system handle may lock up.
-- Always click **Disconnect** (`Ctrl+Q`) before removing hardware.
-- If locked, restart Processing Grapher or reset the USB controller:
-  ```bash
-  sudo udevadm trigger
-  ```
-
-### 3. Graphs Show Erratic Spikes or Missing Values
-- Ensure baud rate in Processing Grapher matches `Serial.begin(...)` in your firmware exactly.
-- Verify that every transmitted frame ends with `\n` (`Serial.println()`).
-- Verify that no extraneous debug strings are interleaved into the CSV stream without using the **Hide Graph Data** option.
+**Reboot the computer** (or log out and log back in) to apply the changes.
 
 ---
 
 ## License & Credits
-
 - **Original Author:** Simon Bluett ([wired.chillibasket.com](https://wired.chillibasket.com/processing-grapher/))
-- **License:** [GNU General Public License v3.0 (GPL-3.0)](LICENSE)
-- **Processing 4 Fork:** [https://github.com/fbetancourt-dev/processing-grapher](https://github.com/fbetancourt-dev/processing-grapher)
+- **License:** GNU General Public License v3 (GPL-3.0)
+- **Repository:** [https://github.com/fbetancourt-dev/processing-grapher](https://github.com/fbetancourt-dev/processing-grapher)
