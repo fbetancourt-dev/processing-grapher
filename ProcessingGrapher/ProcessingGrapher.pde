@@ -7,8 +7,8 @@
  * @website   https://wired.chillibasket.com/processing-grapher/
  *
  * @copyright GNU General Public License v3
- * @date      28th April 2024
- * @version   1.7.0
+ * @date      September 2026
+ * @version   1.7.1
  * * * * * * * * * * * * * * * * * * * * * * */
 
 /*

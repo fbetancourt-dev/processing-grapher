@@ -1,6 +1,8 @@
 [![GPLv3 License](https://img.shields.io/badge/License-GPL%20v3-yellow.svg)](https://opensource.org/licenses/)
-[![Issues](https://img.shields.io/github/issues-raw/chillibasket/processing-grapher.svg?maxAge=25000)](https://github.com/chillibasket/processing-grapher/issues)
-[![GitHub last commit](https://img.shields.io/github/last-commit/chillibasket/processing-grapher.svg?style=flat)](https://github.com/chillibasket/processing-grapher/commits/master)
+[![Processing 4](https://img.shields.io/badge/Processing-4.x-blue.svg)](https://processing.org/)
+[![Java 17](https://img.shields.io/badge/Java-17-orange.svg)](https://adoptium.net/)
+[![GitHub last commit](https://img.shields.io/github/last-commit/fbetancourt-dev/processing-grapher.svg?style=flat)](https://github.com/fbetancourt-dev/processing-grapher/commits/master)
+[![Upstream](https://img.shields.io/badge/upstream-chillibasket%2Fprocessing--grapher-lightgrey)](https://github.com/chillibasket/processing-grapher)
 
 # Serial Monitor and Real-time Graphing Program
 This project is a Processing-based serial terminal and graphing program for the analysis and recording of data from serial devices, such as Arduinos. This program is designed as a replacement for the serial monitor contained within the Arduino IDE. The program contains easy-to-use tools to record data received from serial devices, and to plot numerical data on up to 4 separate graphs in real-time. This makes it useful for quickly analysing sensor data from a micro-controller. 
@@ -13,7 +15,7 @@ A full description and set of instructions can be found on the original website:
 </br>
 </br>
 
-![](/Images/LiveGraph_tab.jpg)
+![](Images/LiveGraph_tab.jpg)
 </br>
 *Live graph tab, illustrating how real-time data can be plotted on multiple graphs*
 </br>
@@ -29,7 +31,7 @@ A full description and set of instructions can be found on the original website:
 	1. Plot real-time data obtained from serial device on a graph
 	1. Can display data on up to 4 separate graphs
 	1. Plot data with respect to time, or with respect to one of the inputs
-	1. Supports comma delimited numbers only (example: 12,24,-15.4)
+	1. Supports delimited numbers (comma, semicolon, tab, colon, space, underscore, vertical bar)
 	1. Apply different colours and names to each input
 	1. Record the real-time data as a comma delimited file
 1. File Graphing
@@ -62,9 +64,9 @@ processing-java --sketch=ProcessingGrapher --run
 </br>
 </br>
 
-### Linux Setup & Permissions
-1. **Renderer:** The sketch uses `JAVA2D` by default (`final String activeRenderer = JAVA2D;`). This avoids JavaFX dependencies and ensures smooth, stable rendering across all Linux desktop environments (X11 and Wayland).
-2. **Serial Port Permissions:** If the error message `Permission Denied` appears when trying to connect to a serial port, add your user to the `dialout` and `tty` groups:
+### Cross-Platform Rendering & Linux Permissions
+1. **Universal Renderer:** The sketch uses `JAVA2D` by default (`final String activeRenderer = JAVA2D;`). In Processing 4, JavaFX is not available; `JAVA2D` provides reliable, high-performance rendering across Linux (X11 and Wayland), macOS, and Windows without external UI dependencies.
+2. **Linux Serial Permissions:** If the error message `Permission Denied` appears on Linux when trying to connect to a serial port, add your user to the `dialout` and `tty` groups:
 	```bash
 	sudo usermod -a -G dialout $USER
 	sudo usermod -a -G tty $USER
@@ -111,13 +113,13 @@ A full set of instructions and documentation can be found on my website at: [htt
 </br>
 </br>
 
-![](/Images/SerialMonitor_tab.jpg) 
+![](Images/SerialMonitor_tab.jpg) 
 </br>
 *Serial monitor tab, showing the communication with an Arduino*
 </br>
 </br>
 
-![](/Images/FileGraph_tab.jpg)
+![](Images/FileGraph_tab.jpg)
 </br>
 *File graph tab, showing how information from a CSV file can be plotted on a graph*
 </br>

@@ -69,7 +69,8 @@ public static class FxDialogs {
     }
 
     public static String showTextInput(String title, String message, String defaultValue) {
-        Object res = JOptionPane.showInputDialog(null, message, title, JOptionPane.QUESTION_MESSAGE, null, null, defaultValue);
+        String prompt = (message != null && !message.trim().isEmpty()) ? (title + "\n" + message) : title;
+        Object res = JOptionPane.showInputDialog(null, prompt, title, JOptionPane.QUESTION_MESSAGE, null, null, defaultValue);
         if (res != null) {
             return res.toString();
         } else {
